@@ -17,6 +17,7 @@ from nltk.tokenize import sent_tokenize
 import abbreviation
 from abbreviation import limits
 
+
 parser = argparse.ArgumentParser(description='BERT Keyword Extraction Model')
 
 parser.add_argument('--data', type=str, default='maui-semeval2010-train',
@@ -192,7 +193,7 @@ import torch
 from torch.optim import Adam
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from torch.nn.utils.rnn import pad_sequence
-from keras.preprocessing.sequence import pad_sequences
+from keras_preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 from pytorch_pretrained_bert import BertTokenizer, BertConfig
 from pytorch_pretrained_bert import BertForTokenClassification, BertAdam
