@@ -337,8 +337,8 @@ for _ in trange(epochs, desc="Epoch"):
     eval_loss = eval_loss/nb_eval_steps
     print("Validation loss: {}".format(eval_loss))
     print("Validation Accuracy: {}".format(eval_accuracy/nb_eval_steps))
-    pred_tags = [tags_vals[p_i] for p in predictions for p_i in p]
-    valid_tags = [tags_vals[l_ii] for l in true_labels for l_i in l for l_ii in l_i]
+    pred_tags = [[tags_vals[p_i] for p in predictions for p_i in p]]
+    valid_tags = [[tags_vals[l_ii] for l in true_labels for l_i in l for l_ii in l_i]]
     print("F1-Score: {}".format(f1_score(pred_tags, valid_tags)))
 
 torch.save(model, args.save)
