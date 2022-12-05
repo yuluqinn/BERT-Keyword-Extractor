@@ -80,7 +80,32 @@ for path in partitives:
 # print(len(test_sents))
 # print(len(test_tags))
 
+from torch import nn
+import torch.nn.functional as F
+from torch.nn.utils.rnn import pack_padded_sequence
 
+#  self.bert = BertModel.from_pretrained(pre_trained)
+#         self.hidden_size = self.bert.config.hidden_size
+#         self.LSTM = nn.LSTM(self.hidden_size,self.hidden_size,bidirectional=True)
+#         self.clf = nn.Linear(self.hidden_size*2,1) 
+
+class BertModel(nn.Module):
+  def __init__(self, pretrained, num_labels):
+    super().__init__()
+    self.bert = BertForTokenClassification.from_pretrained(pretrained, num_labels)
+    self.hidden_size = self.bert.config.hidden_size
+    self.LSTM = nn.LSTM(self.hidden_size,self.hidden_size,bidirectional=True)
+
+  def forward(self,inputs):
+          
+          encoded_layers, pooled_output = self.bert(input_ids=inputs[0],attention_mask=inputs[1])
+          encoded_layers = encoded_layers.permute(1, 0, 2)
+          enc_hiddens, (last_hidden, last_cell) = self.LSTM(pack_padded_sequence(encoded_layers, inputs[2]))
+          output_hidden = torch.cat((last_hidden[0], last_hidden[1]), dim=1)
+          output_hidden = F.dropout(output_hidden,0.2)
+          output = self.clf(output_hidden)
+          
+          return F.sigmoid(output)
 
 # ## Model
 
@@ -141,8 +166,11 @@ valid_sampler = SequentialSampler(valid_data)
 valid_dataloader = DataLoader(valid_data, sampler=valid_sampler, batch_size=bs)
 
 
-model = BertForTokenClassification.from_pretrained("bert-base-uncased", num_labels=len(tag2idx))
+model = BertModel("bert-base-uncased", num_labels=len(tag2idx))
 
+# BertForTokenClassification.from_pretrained("bert-base-uncased", num_labels=len(tag2idx))
+
+# self.LSTM = nn.LSTM(self.hidden_size,self.hidden_size,bidirectional=True)
 
 model = model.cuda()
 
